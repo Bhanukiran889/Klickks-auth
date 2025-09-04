@@ -42,4 +42,11 @@ router.post("/login", (req, res) => {
     res.json({ message: "Login successful", user: req.session.user });
   });
 });
+
+
+router.get("dashboard", (req, res) => {
+if (!req.session.user){
+  return res.status(401).json({message: "Not authenticated"})
+}
+});
 module.exports = router;
