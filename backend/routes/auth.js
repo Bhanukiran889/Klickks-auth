@@ -1,8 +1,7 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
 const db = require("../db");
-const {v4: uuidv4} = require("uuidv4");
-
+const {v4: uuidv4} = require("uuid");
 const router = express.Router();
 
 // Register
@@ -13,10 +12,11 @@ router.post("/register", (req, res) => {
     return res.status(400).json({ message: "Email & password required" });
   }
 
+  const userid = uuidv4();
   const hashedPassword = bcrypt.hashSync(password, 10);
 
   const query = "INSERT INTO users (id, email, password) VALUES (?, ?, ?)";
-  db.run(query, [uuidv4(),email, hashedPassword], function (err) {
+  db.run(query, [userid, email, hashedPassword], function (err) {
     if (err) {
       return res.status(400).json({ message: "User already exists" });
     }
@@ -24,5 +24,22 @@ router.post("/register", (req, res) => {
   });
 });
 
+
+router.post("login", (req, res) => {
+  const {email, password} = req.body;
+  if(!email || !password) {
+    return res.status(400).json({message: "Email & Password required"})
+  }
+  const query = "SELECT * FROM USERS wHERE email = ?"
+
+  db.get(query, [email], (err, user) =>{
+    if(err) return res.status(500).json({message: "DB error"});
+    if(!user) return res.status(401).json({message: "Invalid email"});
+
+    const valid = bcrypt.compareSync(password,user.password);
+    if(!valid) return res.status(401).json({message: "Invalid password"});
+  })
+
+});
 
 module.exports = router;
