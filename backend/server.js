@@ -1,18 +1,17 @@
-// backend/server.js
 const express = require("express");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const authRoutes = require("./routes/auth");
+const morgan = require("morgan")
 
 const app = express();
 
 // Middlewares
 app.use(express.json());
 app.use(cookieParser());
-app.use(
-  cors()
-);
+app.use(morgan("dev"));
+app.use(cors());
 
 // Session setup
 app.use(
@@ -29,5 +28,5 @@ app.use("/auth", authRoutes);
 
 const PORT = 5000;
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`Server running on http://localhost:${PORT}`);
 });
