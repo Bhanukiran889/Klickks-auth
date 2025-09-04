@@ -52,7 +52,7 @@ res.json({message: "Welcome to dashboard", user: req.session.user});
 });
 
 router.post("/logout", (req, res) => {
-  req.sessiondetroy((err) => {
+  req.session.destroy((err) => {
     if (err) return res.status(500).json({message: "Logout error"});
     res.clearCookie("connect.sid");
     res.json({message: "Logged out successfuly"});
