@@ -38,13 +38,20 @@ router.post("/login", (req, res) => {
     const valid = bcrypt.compareSync(password, user.password);
     if (!valid) return res.status(401).json({ message: "Invalid password" });
 
-    //  Save session
+    // Save session
     req.session.user = { id: user.id, email: user.email };
 
-    //  Send success (cookie is auto-set by express-session middleware)
-    res.json({ message: "Login successful", user: req.session.user });
+    // Force cookie to be sent
+    req.session.save((err) => {
+      if (err) return res.status(500).json({ message: "Session save failed" });
+      res.status(200).json({
+        message: "Login successful",
+        user: req.session.user,
+      });
+    });
   });
 });
+
 
 // Dashboard (protected)
 router.get("/dashboard", (req, res) => {
