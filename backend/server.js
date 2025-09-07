@@ -9,8 +9,10 @@ const app = express();
 
 app.use(express.json());
 app.use(morgan("dev"));
+// Trust reverse proxy (needed for Render/Heroku/Netlify, etc.)
+app.set("trust proxy", 1);
 
-// 🔑 Session FIRST
+
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "mysecretkey",
@@ -25,7 +27,7 @@ app.use(
   })
 );
 
-// 🔑 Then CORS
+//  CORS
 app.use(
   cors({
     origin: ["https://klickks-auth.vercel.app", "http://localhost:5173"],
