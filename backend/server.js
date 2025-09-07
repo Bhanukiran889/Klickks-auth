@@ -1,39 +1,26 @@
+require("dotenv").config();
 const express = require("express");
+const session = require("express-session");
 const cors = require("cors");
 const morgan = require("morgan");
-const session = require("express-session");
-const cookieParser = require("cookie-parser");
-const authRoutes = require("./routes/auth")
+
+const authRoutes = require("./routes/auth");
 
 const app = express();
 
-//  Allow both local dev + vercel frontend
-const allowedOrigins = [
-  "http://localhost:3000", // dev
-  "https://klickks-auth.vercel.app", // vercel frontend
-];
+// Middlewares
+app.use(express.json());
+app.use(morgan("dev"));
 
+// CORS
 app.use(
   cors({
-    origin: function (origin, callback) {
-      if (!origin) return callback(null, true); // allow Postman/CLI
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      } else {
-        return callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true, //  allow cookies/auth
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    origin: ["https://klickks-auth.vercel.app", "http://localhost:5173"], // frontend URLs
+    credentials: true, // allow cookies
   })
 );
 
-app.use(express.json());
-app.use(cookieParser());
-app.use(morgan("dev"));
-
-// Session middleware (important for auth persistence)
+// Session
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "mysecretkey",
@@ -41,20 +28,18 @@ app.use(
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: true, // true in prod (HTTPS only)
-      sameSite: "none", //  required for cross-site cookies
+      secure: process.env.NODE_ENV === "production", // secure on Render
+      sameSite: "none", // allow cross-site cookies
       maxAge: 1000 * 60 * 60 * 24, // 1 day
     },
   })
 );
 
-// Root test route
-app.get("/", (req, res) => {
-  res.send("API is running 🚀");
-});
-
-// Auth routes
+// Routes
 app.use("/auth", authRoutes);
+
+// Test root
+app.get("/", (req, res) => res.send("API running 🚀"));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
