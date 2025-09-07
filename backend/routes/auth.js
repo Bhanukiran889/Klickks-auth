@@ -27,10 +27,10 @@ router.post("/login", (req, res) => {
     const valid = bcrypt.compareSync(password, user.password);
     if (!valid) return res.status(401).json({ message: "Invalid password" });
 
-    // ✅ Save session
+    //  Save session
     req.session.user = { id: user.id, email: user.email };
 
-    // ✅ Explicitly send the session cookie in response
+    //  Explicitly send the session cookie in response
     res.status(200).json({ message: "Login successful", user: req.session.user });
   });
 });

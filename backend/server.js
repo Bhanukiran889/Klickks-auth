@@ -23,6 +23,7 @@ app.use(
 // Session
 app.use(
   session({
+    name: "klickks.sid", // custom name avoids conflicts
     secret: process.env.SESSION_SECRET || "mysecretkey",
     resave: false,
     saveUninitialized: false,
