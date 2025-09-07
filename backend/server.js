@@ -28,10 +28,11 @@ app.use(
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", //  only true in prod
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // allow cross-site cookies
-      maxAge: 1000 * 60 * 60 * 24, // 1 day
-    },
+      secure: true,           // because Render uses HTTPS
+      sameSite: "none",       // allow cross-site (vercel → render)
+      maxAge: 1000 * 60 * 60 * 24
+    }
+    ,
   })
 );
 
