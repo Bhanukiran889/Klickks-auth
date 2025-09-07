@@ -5,22 +5,12 @@ const cors = require("cors");
 const morgan = require("morgan");
 
 const authRoutes = require("./routes/auth");
-
 const app = express();
 
-// Middlewares
 app.use(express.json());
 app.use(morgan("dev"));
 
-// CORS
-app.use(
-  cors({
-    origin: ["https://klickks-auth.vercel.app", "http://localhost:5173"], // frontend URLs
-    credentials: true, // allow cookies
-  })
-);
-
-// Session
+// 🔑 Session FIRST
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "mysecretkey",
@@ -28,14 +18,20 @@ app.use(
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: true,           // because Render uses HTTPS
-      sameSite: "none",       // allow cross-site (vercel → render)
-      maxAge: 1000 * 60 * 60 * 24
-    }
-    ,
+      secure: process.env.NODE_ENV === "production", // only true on Render
+      sameSite: "none", // allow cross-site
+      maxAge: 1000 * 60 * 60 * 24, // 1 day
+    },
   })
 );
 
+// 🔑 Then CORS
+app.use(
+  cors({
+    origin: ["https://klickks-auth.vercel.app", "http://localhost:5173"],
+    credentials: true,
+  })
+);
 
 // Routes
 app.use("/auth", authRoutes);
