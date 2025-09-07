@@ -4,7 +4,7 @@ import axios from "axios";
 import Register from "./components/Register";
 import Login from "./components/Login";
 import Dashboard from "./components/Dashboard";
-import ServerNotice from "./components/ServerNotice"; // ✅ Cold start notice
+import ServerNotice from "./components/ServerNotice"; // Cold start notice
 
 function App() {
   const [serverCold, setServerCold] = useState(false);
@@ -22,7 +22,7 @@ function App() {
 
   return (
     <>
-      {serverCold && <ServerNotice />} {/* ✅ Show cold start notice */}
+      {serverCold && <ServerNotice />} {/*  Show cold start notice */}
 
       <Routes>
         <Route path="/" element={<Navigate to="/login" />} />
