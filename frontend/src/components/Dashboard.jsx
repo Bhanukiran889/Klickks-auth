@@ -1,6 +1,6 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
@@ -8,7 +8,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     axios
-      .get("/dashboard")
+      .get("/dashboard") //  now automatically sends cookies
       .then((res) => setUser(res.data.user))
       .catch((error) => {
         if (error.response && error.response.status === 401) {
@@ -18,7 +18,7 @@ const Dashboard = () => {
   }, [navigate]);
 
   const handleLogout = async () => {
-    await axios.post("/logout");
+    await axios.post("/logout"); //  with cookies
     navigate("/login", { replace: true });
   };
 
