@@ -10,7 +10,11 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("/login", { email, password });
+      await axios.post(
+        "/login",
+        { email, password },
+        { withCredentials: true }
+      );
       navigate("/dashboard");
     } catch (err) {
       alert(err.response?.data?.message || "Error logging in");

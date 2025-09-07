@@ -23,18 +23,18 @@ app.use(
 // Session
 app.use(
   session({
-    name: "klickks.sid", // custom name avoids conflicts
     secret: process.env.SESSION_SECRET || "mysecretkey",
     resave: false,
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // secure on Render
-      sameSite: "none", // allow cross-site cookies
+      secure: process.env.NODE_ENV === "production", // ✅ only true in prod
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // ✅ allow cross-site cookies
       maxAge: 1000 * 60 * 60 * 24, // 1 day
     },
   })
 );
+
 
 // Routes
 app.use("/auth", authRoutes);
