@@ -23,7 +23,7 @@ app.use(
     secret: "mysecretkey",
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false }, // secure: true in production with HTTPS
+    cookie: { secure: true }, // secure: true in production with HTTPS
   })
 );
 
