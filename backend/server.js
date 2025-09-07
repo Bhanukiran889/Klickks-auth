@@ -1,66 +1,41 @@
-// server.js
-require("dotenv").config();
 const express = require("express");
-const session = require("express-session");
-const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const morgan = require("morgan");
-const authRoutes = require("./routes/auth");
 
 const app = express();
 
-// Allowed origins (from .env or fallback)
-const allowedOrigins = process.env.ALLOWED_ORIGINS
-  ? process.env.ALLOWED_ORIGINS.split(",")
-  : ["http://localhost:5173"];
+// ✅ Allow both local dev + vercel frontend
+const allowedOrigins = [
+  "http://localhost:3000", // dev
+  "https://klickks-auth.vercel.app" // vercel frontend
+];
 
-// Middleware
-app.use(express.json());
-app.use(cookieParser());
-app.use(morgan("dev"));
-
-// CORS setup
 app.use(
   cors({
     origin: function (origin, callback) {
-      // allow requests with no origin (like Postman, curl)
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
+      if (!origin) return callback(null, true); // allow non-browser requests (like Postman)
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
       } else {
-        callback(new Error("Not allowed by CORS"));
+        return callback(new Error("Not allowed by CORS"));
       }
     },
-    credentials: true,
+    credentials: true, // if you are using cookies/auth
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type", "Authorization"]
   })
 );
 
-// Handle preflight requests
-app.options(/.*/, cors({
-  origin: allowedOrigins,
-  credentials: true
-}));
+app.use(express.json());
+app.use(morgan("dev"));
 
-// Session setup
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET || "defaultsecret",
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      httpOnly: true, // prevents JS access to cookies
-      secure: process.env.NODE_ENV === "production", // only true with HTTPS
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-    },
-  })
-);
-
-// Routes
-app.use("/auth", authRoutes);
-
-// Server start
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`✅ Server running on http://localhost:${PORT}`);
+// ✅ Test root
+app.get("/", (req, res) => {
+  res.send("API is running 🚀");
 });
+
+// ✅ Routes
+app.use("/auth", require("./routes/authRoutes")); 
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
